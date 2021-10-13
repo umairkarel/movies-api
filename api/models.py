@@ -9,7 +9,7 @@ def current_year():
 class Movie(models.Model):
     title = models.CharField(max_length=30)
     runtime = models.IntegerField()
-    genre = models.ManyToManyField(Genre)
+    genre = models.TextField()
     rating = models.FloatField()
     overview = models.TextField()
     meta_score = models.FloatField()
@@ -22,8 +22,3 @@ class Movie(models.Model):
     def __str__(self):
         return f"{self.title}"
 
-class Genre(models.Model):
-    name = models.CharField(max_length=10)
-
-    def __str__(self):
-        return f"{self.name}"
