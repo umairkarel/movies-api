@@ -11,7 +11,7 @@ from .serializers import MovieSerializer, GenreSerializer
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([permissions.IsAuthenticated])
 def overview(request):
     api_urls = {
         'Movies List':'api/movies/',
