@@ -4,48 +4,48 @@
 1. Fork this repo.
 2. 
     ```shell
-        python manage.py makemigrations
-        python manage.py migrate 
+    python manage.py makemigrations
+    python manage.py migrate 
     ```
 3. Loading Movies data to the Database
     ```shell
-        python manage.py shell
+    python manage.py shell
     ``` 
     Paste this program in the shell and run
     ```python
-        import pandas as pd
-        from api.models import Movie, Genre
-        df = pd.read_csv('movies.csv')
+    import pandas as pd
+    from api.models import Movie, Genre
+    df = pd.read_csv('movies.csv')
+    
+    # Loading Genres
+    genres = pd.unique(df["Genre"].str.split(", ", expand=True).stack())
+    for genre in genres:
+        Genre.objects.create(name=genre)
+    
+    # Loading Movies
+    for i in range(df.shape[0]):
+        row = df.iloc[i]
+        genres = row.Genre
         
-        # Loading Genres
-        genres = pd.unique(df["Genre"].str.split(", ", expand=True).stack())
-        for genre in genres:
-            Genre.objects.create(name=genre)
+        # Creating movie object for each row in csv
+        m = Movie(title=row.Series_Title, 
+                  runtime=row.Runtime, 
+                  rating=row.IMDB_Rating, 
+                  overview=row.Overview,
+                  meta_score=row.Meta_score,
+                  director=row.Director,
+                  votes=row.No_of_Votes,
+                  gross=row.Gross,
+                  year=row.Released_Year,
+                  poster_url=row.Poster_Link
+                  )
+        # Saving the Movie Object first to add genres later
+        m.save()
         
-        # Loading Movies
-        for i in range(df.shape[0]):
-            row = df.iloc[i]
-            genres = row.Genre
-            
-            # Creating movie object for each row in csv
-            m = Movie(title=row.Series_Title, 
-                      runtime=row.Runtime, 
-                      rating=row.IMDB_Rating, 
-                      overview=row.Overview,
-                      meta_score=row.Meta_score,
-                      director=row.Director,
-                      votes=row.No_of_Votes,
-                      gross=row.Gross,
-                      year=row.Released_Year,
-                      poster_url=row.Poster_Link
-                      )
-            # Saving the Movie Object first to add genres later
-            m.save()
-            
-            # Linking all the genres of current Movie with genre object 
-            for genre in genres.split(', '):
-                genre_obj = Genre.objects.get(name=genre)
-                m.genres.add(genre_obj)
+        # Linking all the genres of current Movie with genre object 
+        for genre in genres.split(', '):
+            genre_obj = Genre.objects.get(name=genre)
+            m.genres.add(genre_obj)
     ```
 
 Congrats! Your database is ready. Now you can use the API
